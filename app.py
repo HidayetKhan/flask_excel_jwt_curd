@@ -79,61 +79,93 @@ class ParcelExcle(Resource):
 
 
 
+ 
+
 class GetUser(Resource):
     @jwt_required()
-    def get(self,user_id):
+    def get(self, user_id):
         try:
-            user=User.query.get(user_id)
+            # Retrieve the user from the database
+            user = User.query.get(user_id)
+
             if user:
-                print(user)
-                return jsonify({'username':user.username,'password':user.password}),200
-                
+                user_data = {
+                    'username': user.username,
+                    'password': user.password
+                }
+
+                response = jsonify(user_data)
+                response.status_code = 200
+                return response
             else:
-                return jsonify({'error':'user not found'}),400
+                response = jsonify({'error': 'User not found'})
+                response.status_code = 404
+                return response
         except Exception as e:
             import traceback
             traceback.print_exc()
-            return jsonify({'error':str(e)}),500  
+            response = jsonify({'error': str(e)})
+            response.status_code = 500
+            return response
+
+
+
+
+
 
 
 class UpdateUser(Resource):
     @jwt_required()
-    def put(self,user_id):
+    def put(self, user_id):
         try:
-            user=User.query.get(user_id)
+            user = User.query.get(user_id)
             if user:
-                data=request.get_json()
-                username=data.get('username')
-                password=data.get('password')
+                data = request.get_json()
+                username = data.get('username')
+                password = data.get('password')
+
                 if username:
-                    user.username=username
+                    user.username = username
                 if password:
-                    user.password=password
+                    user.password = password
+
                 db.session.commit()
-                return jsonify({'message':'user is update sucssefully'}),200
+                response = jsonify({'message': 'User is updated successfully'})
+                response.status_code = 200
+                return response
             else:
-                return jsonify({'error':'user not found'}),400
+                response = jsonify({'error': 'User not found'})
+                response.status_code = 404
+                return response
         except Exception as e:
             import traceback
             traceback.print_exc()
-            return jsonify({'error':str(e)}),500
-            
+            response = jsonify({'error': str(e)})
+            response.status_code = 500
+            return response
+
 class DeleteUser(Resource):
     @jwt_required()
-    def delete(self,user_id):
+    def delete(self, user_id):
         try:
             user = User.query.get(user_id)
-            print(f"User: {user}") 
+
             if user:
                 db.session.delete(user)
                 db.session.commit()
-                return jsonify({'message': 'User deleted successfully'}), 200
+                response = jsonify({'message': 'User deleted successfully'})
+                response.status_code = 200
+                return response
             else:
-                return jsonify({'error': 'User not found'}), 404
+                response = jsonify({'error': 'User not found'})
+                response.status_code = 404
+                return response
         except Exception as e:
             import traceback
             traceback.print_exc()
-            return jsonify({'error': str(e)}), 500
+            response = jsonify({'error': str(e)})
+            response.status_code = 500
+            return response
 
 
 
